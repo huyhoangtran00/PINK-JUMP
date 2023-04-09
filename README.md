@@ -1,4 +1,4 @@
-# PINK BEAR
+# PINK JUMP
 # Source code : 
 
 ## Thư viện SDL2 và cách cài 
