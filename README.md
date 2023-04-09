@@ -1,6 +1,6 @@
 # PINK JUMP
 # Source code : 
-
+https://github.com/huyhoangtran00/PINK-JUMP
 ## Thư viện SDL2 và cách cài 
 - Các thư viện SDL2 sử dụng : SDL.h, SDL_image.h, SDL_mixer.h, SDL_TTF.h
 - Hướng dẫn cài các thư viện SDL : Tham khảo trên trang web Lazyfoo
