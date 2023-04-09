@@ -13,11 +13,11 @@ hoặc trên link youtube đới với cài SDL2 trên VSC và sử dựng Makef
 ## Cách chơi và tính điểm
 - Bạn sẽ dùng các phím mũi tên lên, sang trái, sang phải để di chuyển
 - Ngoài ra bạn còn có thêm tính năng đặc biệt là khi ấn nút X bạn có thể dịch chuyển tức thời theo hướng vận tốc ban đầu một lượng khoảng cách, hãy tận dụng kĩ năng đặc biệt để cứu thua bạn trong những tình huống éo le nhé :))
-- Cách tính điểm, điểm sẽ được tính theo thời gian bạn sống xót.
+- Cách tính điểm, điểm sẽ được tính theo thời gian bạn sống sót.
 ## Các tính năng của game :
 - Có các hiệu ứng animation cho việc nhân vật nhảy, đứng yên
 - Có các hiệu ứng âm thanh khi nhân vật nhảy, music cho trò chơi
-- Chức năng tính điểm theo thời gian sống xót.
+- Chức năng tính điểm theo thời gian sống sót.
 - Điểm cao (đang update thêm)
 - Menu cho trờ chơi
 ## Code tham khảo chủ yếu ở lazyfoo : https://lazyfoo.net/tutorials/SDL/index.php
