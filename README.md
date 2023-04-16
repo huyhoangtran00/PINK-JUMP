@@ -11,15 +11,18 @@ hoặc trên link youtube đới với cài SDL2 trên VSC và sử dựng Makef
 - Bạn sẽ có cho mình 3 mạng để chơi, hết 3 mạng thì bạn sẽ chết
 - Bạn cũng có thể kiếm thêm mạng cho mình, bằng cách thu thập các quả tim rơi xuất hiện ngẫu nhiên trên các đám mây.
 ## Cách chơi và tính điểm
-- Bạn sẽ dùng các phím mũi tên lên, sang trái, sang phải để di chuyển
+- Bạn sẽ dùng các phím mũi tên sang trái, sang phải để di chuyển
 - Ngoài ra bạn còn có thêm tính năng đặc biệt là khi ấn nút X bạn có thể dịch chuyển tức thời theo hướng vận tốc ban đầu một lượng khoảng cách, hãy tận dụng kĩ năng đặc biệt để cứu thua bạn trong những tình huống éo le nhé :))
-- Cách tính điểm, điểm sẽ được tính theo thời gian bạn sống sót.
+- Cách tính điểm, điểm sẽ được tính bằng cách nhảy lên và va chạm với các đám mây.
 ## Các tính năng của game :
-- Có các hiệu ứng animation cho việc nhân vật nhảy, đứng yên
+- Có các hiệu ứng animation cho việc nhân vật nhảy, mất mạng, tên lửa chuyển động,..
 - Có các hiệu ứng âm thanh khi nhân vật nhảy, music cho trò chơi
-- Chức năng tính điểm theo thời gian sống sót.
-- Điểm cao (đang update thêm)
+- Chức năng tính điểm.
+- Điểm cao 
 - Menu cho trờ chơi
+- Có các mạng cho nhân vật, sau mỗi lần mất mạng thì nhân vật sẽ trở về vị trí một đám mây
+- Có các item cho nhân vật.
+- Độ khó của game thay đổi theo thời gian
 ## Code tham khảo chủ yếu ở lazyfoo : https://lazyfoo.net/tutorials/SDL/index.php
 
 ## Cảm ơn mọi người đã ghé qua, đây là tựa game khá đơn giản và cũng là lần đầu mình làm một trò chơi như này, nếu các bạn có góp ý thì có thể mình qua mail : huyhoangtran00@gmail.com
