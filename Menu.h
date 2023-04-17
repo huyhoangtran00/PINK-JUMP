@@ -17,4 +17,6 @@ public:
     void draw(SDL_Renderer *gRenderer);
     void check_mouse(SDL_Event event, bool &quit);
     void load(SDL_Renderer *gRenderer);
+    void Exit(SDL_Event event, bool &quit, bool &QUIT);
+    void drawExit(SDL_Renderer *gRenderer);
 };

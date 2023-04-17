@@ -29,23 +29,7 @@ void Map::draw(SDL_Renderer *gRenderer)
 {
     for (int i = 0; i < 7; i++)
     {
-        platform[i].rect.y += 2;
+
         platform[i].Render(gRenderer, NULL);
-        if (platform[i].rect.y > SCREEN_HEIGHT)
-        {
-            platform[i].rect.x = rand() % SCREEN_WIDTH + 0;
-            platform[i].rect.y = 0;
-        }
-        if (i == 2 || i == 5)
-        {
-            if (platform[i].rect.x < SCREEN_WIDTH / 4)
-            {
-                platform[i].rect.x++;
-            }
-            if (platform[i].rect.x > SCREEN_WIDTH * 3 / 4)
-            {
-                platform[i].rect.x--;
-            }
-        }
     }
 }

@@ -8,12 +8,24 @@
 SDL_Renderer *gRenderer = NULL;
 SDL_Window *gWindow = NULL;
 Mix_Music *gMusic = NULL;
+Mix_Music *score_sound = NULL;
+Mix_Chunk *win = NULL;
+Mix_Chunk *start = NULL;
+TTF_Font *gFont = NULL;
+SDL_Color color = {255, 153, 204};
+Object score_text;
+string SCORE;
+SDL_Surface *icon;
 SDL_Event event;
 Object background;
+Object back1;
 Rock rock;
 Map map;
 Player player(map.platform);
 Menu menu;
+int score = 0;
+int high_score;
+bool QUIT = false;
 int volume;
 bool init();
 void loadMedia();
@@ -24,64 +36,137 @@ int main(int argc, char *argv[])
         return -1;
     bool quit = false;
     bool quitMenu = false;
-
+    bool quitScore = false;
     loadMedia();
-    // srand(time(0)); // set initial seed value to system clock
-
-    while (!quitMenu)
+    SDL_SetWindowIcon(gWindow, icon);
+    srand(time(0)); // set initial seed value to system clock
+    while (!QUIT)
     {
-        SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-        SDL_RenderClear(gRenderer);
-        if (Mix_PlayingMusic() == 0)
+
+        ifstream file("highscore.txt");
+        file >> high_score;
+        file.close();
+        quit = false;
+        quitScore = false;
+        quitMenu = false;
+        Mix_PlayChannel(-1, start, 0);
+        while (!quitMenu)
         {
-            // Play the music
-            Mix_PlayMusic(gMusic, -1);
+            // if (Mix_PlayingMusic() == 0)
+            // {
+            //     // Play the music
+            //     Mix_PlayMusic(gMusic, -1);
+            // }
+            SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+            SDL_RenderClear(gRenderer);
+
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    quitMenu = true;
+                    quit = true;
+                    quitScore = true;
+                    QUIT = true;
+                }
+                menu.check_mouse(event, quitMenu);
+            }
+            background.Render(gRenderer);
+            back1.Render(gRenderer);
+            menu.draw(gRenderer);
+            SDL_RenderPresent(gRenderer);
         }
 
-        while (SDL_PollEvent(&event))
+        if (score >= 0 || quit == true)
         {
-            if (event.type == SDL_QUIT)
-            {
-                quitMenu = true;
-                quit = true;
-            }
-            menu.check_mouse(event, quitMenu);
+            player.reset();
+            SDL_RenderClear(gRenderer);
+            quit = false;
         }
-        background.Render(gRenderer);
-        menu.draw(gRenderer);
-        SDL_RenderPresent(gRenderer);
+        while (!quit)
+        {
+            // if (Mix_PlayingMusic() == 0)
+            // {
+            //     // Play the music
+            //     Mix_PlayMusic(gMusic, -1);
+            // }
+            // If there is no music playing
+            score_text.rect.y = 50;
+            score_text.rect.x = SCREEN_WIDTH - score_text.rect.w;
+
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    quitMenu = true;
+                    quit = true;
+                    quitScore = true;
+                }
+                player.handleEvent(event);
+            }
+            SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+            SDL_RenderClear(gRenderer);
+
+            player.update(map.platform, rock.rock, score);
+            score_text.loadText(SCORE, color, gFont, gRenderer);
+            rock.update(player.rect);
+            background.Render(gRenderer);
+            map.draw(gRenderer);
+            player.draw(gRenderer, quit);
+            rock.draw(gRenderer);
+            SCORE = "SCORE:" + to_string(score);
+            score_text.Render(gRenderer);
+            SDL_Delay(30);
+            if (score > high_score)
+            {
+                ofstream out("highscore.txt");
+                out.clear();
+                out << score;
+            }
+            SDL_RenderPresent(gRenderer);
+        }
+
+        QUIT = true;
+        Mix_PlayChannel(-1, win, 0);
+        while (!quitScore)
+        {
+
+            SDL_RenderClear(gRenderer);
+            score_text.loadText(SCORE, color, gFont, gRenderer);
+            score_text.rect.x = SCREEN_WIDTH / 2 - score_text.rect.w / 2;
+            score_text.rect.y = SCREEN_HEIGHT / 2 - score_text.rect.h / 2;
+            background.Render(gRenderer);
+            SCORE = "YOUR SCORE IS : " + to_string(score);
+            score_text.Render(gRenderer);
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    quitMenu = true;
+                    quit = true;
+                    quitScore = true;
+                }
+                menu.Exit(event, quitScore, QUIT);
+            }
+
+            menu.drawExit(gRenderer);
+            SDL_Delay(30);
+            SDL_RenderPresent(gRenderer);
+        }
+        if (QUIT == false)
+        {
+            quitMenu = false;
+            quit = false;
+            quitScore = false;
+        }
+        if (score > high_score)
+        {
+            ofstream out("highscore.txt");
+            out.clear();
+            out << score;
+        }
     }
 
-    while (!quit)
-    {
-        if (Mix_PlayingMusic() == 0)
-        {
-            // Play the music
-            Mix_PlayMusic(gMusic, -1);
-        }
-        // If there is no music playing
-
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-            player.handleEvent(event);
-        }
-        SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-        SDL_RenderClear(gRenderer);
-
-        player.update(map.platform, rock.rock);
-        rock.update(player.rect);
-        background.Render(gRenderer);
-        player.draw(gRenderer, quit);
-        map.draw(gRenderer);
-
-        rock.draw(gRenderer);
-        SDL_Delay(30);
-        SDL_RenderPresent(gRenderer);
-    }
     free();
     return 0;
 }
@@ -106,7 +191,7 @@ bool init()
         }
 
         // Create window
-        gWindow = SDL_CreateWindow("Game Doudle", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        gWindow = SDL_CreateWindow("PINK JUMP", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
         if (gWindow == NULL)
         {
@@ -156,10 +241,24 @@ void loadMedia()
 {
 
     // Load music
+    start = Mix_LoadWAV("music/start.mp3");
+    win = Mix_LoadWAV("music/win.mp3");
     menu.load(gRenderer);
+    icon = IMG_Load("img/icon1.png");
     gMusic = Mix_LoadMUS("music/game1.mp3");
+    score_sound = Mix_LoadMUS("music/score.wav");
     player.setAnimation(gRenderer);
     background.LoadImg("img/background1.png", gRenderer);
+    back1.LoadImg("img/back1.png", gRenderer);
+    back1.rect.h = 150;
+    back1.rect.w = 400;
+    back1.rect.x = SCREEN_WIDTH / 2 - back1.rect.w / 2;
+    back1.rect.y = 100;
+    gFont = TTF_OpenFont("font/game.ttf", 28);
+    SCORE = "SCORE:" + to_string(0);
+    score_text.loadText(SCORE, color, gFont, gRenderer);
+    score_text.rect.x = SCREEN_WIDTH - score_text.rect.w;
+    score_text.rect.y = 50;
     background.rect = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
     map.loadMap(gRenderer);
     rock.loadRock(gRenderer);

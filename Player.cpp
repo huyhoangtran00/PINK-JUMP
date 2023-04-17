@@ -19,6 +19,11 @@ Player::Player(Object platform[7])
     check = false;
     dead = false;
     heart = 3;
+    load_sound();
+    for (int i = 0; i < 7; i++)
+    {
+        check_score[i] = false;
+    }
 }
 
 Player::~Player()
@@ -37,10 +42,11 @@ void Player::attack()
 void Player::jump()
 {
 
-    if (!isJump)
+    if (!isJump || onGround)
     {
+        Mix_PlayChannel(-1, jump_sound, 0);
         isJump = true;
-        vy = -27;
+        vy = -35;
     }
 }
 void Player::moveLeft()
@@ -77,6 +83,7 @@ void Player::SpeedTele()
             rect.y -= 100;
 
         speed = true;
+        Mix_PlayChannel(-1, speed_sound, 0);
     }
 }
 
@@ -92,7 +99,7 @@ void Player::draw(SDL_Renderer *gRenderer, bool &quit)
     }
     if (dead)
     {
-        int frame = cnt / 8;
+        int frame = cnt / 12;
         Animation[DEAD].rect.x = rect.x;
         Animation[DEAD].rect.y = rect.y;
         Animation[DEAD].Render(gRenderer, &dead_rect[frame]);
@@ -103,23 +110,6 @@ void Player::draw(SDL_Renderer *gRenderer, bool &quit)
         }
     }
 
-    else if (idle == true && isJump != true)
-    {
-        int frame = cnt / 15;
-        Animation[IDLE].rect.x = rect.x;
-        Animation[IDLE].rect.y = rect.y;
-        if (idle_right)
-        {
-            Animation[IDLE].Render(gRenderer, &idle_rect[frame]);
-        }
-        else
-        {
-            Animation[IDLE].RenderEx(gRenderer, &idle_rect[frame]);
-        }
-        cnt++;
-        if (frame >= 4)
-            cnt = 0;
-    }
     else if (isRight && !dead)
     {
         int frame = cnt / 10;
@@ -148,9 +138,9 @@ void Player::handleEvent(SDL_Event event)
     {
         switch (event.key.keysym.sym)
         {
-        case SDLK_UP:
-            jump();
-            break;
+        // case SDLK_UP:
+        //     jump();
+        //     break;
         case SDLK_LEFT:
             moveLeft();
             break;
@@ -197,14 +187,14 @@ void Player::handleEvent(SDL_Event event)
         }
     }
 }
-void Player::update(Object platform[7], Object rock[2])
+void Player::update(Object platform[7], Object rock[2], int &score)
 {
     // Apply gravity
     if (!onGround && !dead)
         vy += GRAVITY;
 
     // Move the player horizontally
-
+    score = this->score;
     // is deaded
 
     if (dead)
@@ -244,6 +234,22 @@ void Player::update(Object platform[7], Object rock[2])
     }
     rect.y += vy;
     // Check for collisions with the ground
+
+    if (rect.y < SCREEN_HEIGHT / 2 - 100)
+    {
+        for (int i = 0; i < 7; i++)
+        {
+            rect.y = SCREEN_HEIGHT / 2 - 100;
+            platform[i].rect.y = platform[i].rect.y - vy;
+            if (platform[i].rect.y > SCREEN_HEIGHT)
+            {
+                check_score[i] = false;
+                platform[i].rect.y = 0;
+                platform[i].rect.x = rand() % SCREEN_WIDTH;
+            }
+        }
+    }
+
     for (int i = 0; i < 7; i++)
     {
         // va cham
@@ -254,12 +260,18 @@ void Player::update(Object platform[7], Object rock[2])
             vy >= 0 && !dead)
         {
 
+            jump();
             rect.y = platform[i].rect.y - PLAYER_H;
-
+            if (!check_score[i])
+            {
+                score += 10;
+                this->score += 10;
+                check_score[i] = true;
+            }
             isJump = false;
 
-            vy = 0;
             onGround = true;
+
             speed = false;
         }
     }
@@ -281,15 +293,27 @@ void Player::update(Object platform[7], Object rock[2])
                 int k = rand() % 7 + 0;
                 rect.x = platform[k].rect.x;
                 rect.y = platform[k].rect.y - platform[k].rect.h - PLAYER_H;
+                Mix_PlayChannel(-1, revive_sound, 0);
             }
         }
     }
 
-    if (rect.y <= 0)
+    if (rock[0].rect.y >= SCREEN_HEIGHT)
     {
-        rect.y = 0;
-        vy = 0;
+        bf.x = rect.x;
+        bf.y = rect.y;
     }
+    double tan;
+    if (bf.x != 0)
+        tan = bf.y / bf.x;
+
+    rock[0].rect.y++;
+        rock[0].rect.x = rock[0].rect.y / tan;
+    // if (rect.y <= 0)
+    // {
+    //     rect.y = 0;
+    //     vy = 0;
+    // }
 
     if (rect.y + PLAYER_H >= SCREEN_HEIGHT && !dead)
     {
@@ -297,6 +321,7 @@ void Player::update(Object platform[7], Object rock[2])
         if (heart >= 0)
         {
             int k = rand() % 7 + 0;
+            Mix_PlayChannel(-1, revive_sound, 0);
             rect.x = platform[k].rect.x;
             rect.y = platform[k].rect.y - platform[k].rect.h - PLAYER_H;
 
@@ -304,6 +329,10 @@ void Player::update(Object platform[7], Object rock[2])
             speed = false;
             isJump = false;
         }
+    }
+    if (rect.y + PLAYER_H >= SCREEN_HEIGHT && dead)
+    {
+        rect.y -= 50;
     }
 
     else
@@ -346,4 +375,27 @@ void Player::setAnimation(SDL_Renderer *gRenderer)
         hearts[i].LoadImg("img/heart.png", gRenderer);
         hearts[i].rect = {SCREEN_WIDTH - 35 * (i + 1), 0, 40, 40};
     }
+}
+
+void Player::load_sound()
+{
+    // Initialize SDL_mixer
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+    {
+        printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+    }
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+    }
+    revive_sound = Mix_LoadWAV("music/dau.mp3");
+    jump_sound = Mix_LoadWAV("music/meo.mp3");
+    speed_sound = Mix_LoadWAV("music/deptry.mp3");
+}
+
+void Player::reset()
+{
+    heart = 3;
+    dead = false;
+    score = 0;
 }

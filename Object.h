@@ -13,7 +13,7 @@ public:
     bool LoadImg(string path, SDL_Renderer *gRenderer);
     void Render(SDL_Renderer *gRenderer, const SDL_Rect *clip = NULL);
     void RenderEx(SDL_Renderer *gRenderer, const SDL_Rect *clip = NULL);
-
+    bool loadText(string textureText, SDL_Color textColor, TTF_Font *gFont, SDL_Renderer *gRenderer);
     void Free();
     bool checkCollision(SDL_Rect a, SDL_Rect b);
     SDL_Texture *texture;

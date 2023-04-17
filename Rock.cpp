@@ -44,8 +44,10 @@ void Rock::update(SDL_Rect rect_player)
             rock[i].rect.y = 0;
         }
     }
-    rock[0].rect.y += 5;
-    rock[1].rect.y += 10;
+
+    rock[0].rect.y += 10;
+
+    rock[1].rect.y += 15;
 }
 void Rock::loadRock(SDL_Renderer *gRenderer)
 {

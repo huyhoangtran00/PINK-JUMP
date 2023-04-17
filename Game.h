@@ -6,9 +6,10 @@
 #include <string>
 #include <SDL_ttf.h>
 #include <cmath>
-#include <cstdlib> // for rand() and srand()
+#include <cstdlib>
 #include <ctime>
 #include <SDL_mixer.h>
+#include <fstream>
 #include <vector>
 using namespace std;
 
@@ -25,5 +26,5 @@ const int SCREEN_HEIGHT = 640;
 #define PLAYER_W 60
 #define PLAYER_H 60
 #define GRAVITY 2
-#define MENU_PLAY_H 60
-#define MENU_PLAY_W 300
+#define MENU_PLAY_H 70
+#define MENU_PLAY_W 270
